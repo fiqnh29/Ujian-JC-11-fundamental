@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            table, th, td{
+                border: black 2px solid;
+                background: white;
+                border-collapse: collapse;
+                height: 30px;
+                width: 900px;
+                text-align: center;
+                padding: 20px;
+                font-size: 20px;
+            }
+            #menuBox, #logout{
+                display: none;
+            }
+        </style>
+
+    </head>
+    <body>
+
+        <center>
+        <div id="loginBox">
+            <input id="nama" type="text" placeholder="Username">
+            <input id="password" type="password" placeholder="Password">
+            <input type="button" onclick="login()" value="Login">
+        </div>
+        
+        <div id="box">
+            <h1>Madding</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <td>No.</td>
+                        <td>Kegiatan</td>
+                        <td>Hari</td>
+                        <td>Poster</td>
+                        <td>Action</td>
+                    </tr>
+                </thead>
+                <div id="menuBox">
+                    <tbody id="menu">
+                        
+                    </tbody>
+                </div>
+            </table>
+        </div>
+        <h1 id="outNama"></h1>
+        <input id="logout" type="button" value="Logout" onclick="logout()">
+
+        </center>
+
+
+        <script>
+            class dataUser{
+                constructor(nama, password){
+                    this.nama=nama
+                    this.password=password
+                    this.role='admin'
+                }
+            }
+            var user=[
+                {nama:'fiqri', password:'qwerty', role:'user'},
+                {nama:'andi', password:'asd', role:'user'},
+                {nama:'admin', password:'admin', role:'admin'}
+            ]
+            class dataKegiatan{
+                constructor(kegiatan, hari, poster){
+                    this.kegiatan = kegiatan
+                    this.hari = hari
+                    this.poster = poster
+                }
+            }
+            var menu = [
+                new dataKegiatan ('Lari', 'Senin', 'https://thumb.viva.co.id/media/frontend/thumbs3/2018/01/03/5a4c691dcc317-ini-bedanya-lari-indoor-dan-outdoor-yang-perlu-anda-tahu_665_374.jpg'),
+                new dataKegiatan ('Estafet', 'Selasa', 'https://moondoggiesmusic.com/wp-content/uploads/2019/07/Teknik-Lari-Estafet.png')
+
+            ]
+            function dataBase(nama, password){
+                for(var i=0; i<user.length; i++){
+                    if(nama === user[i].nama && password === user[i].password){
+                        return user[i].role
+                    }
+                }
+            }
+            function login(){
+                var inputNama = document.getElementById('nama').value
+                var inputPassword = document.getElementById('password').value
+                if(dataBase(inputNama, inputPassword)==='user'){
+                    document.getElementById('outNama').innerHTML=inputNama
+                    document.getElementById('menuBox').style.display='block'
+                    document.getElementById('logout').style.display='block'
+                    document.getElementById('password').value=''
+                    document.getElementById('nama').value=''
+                    printMenuUser()
+
+                    
+                }else if(dataBase(inputNama, inputPassword)==='admin'){
+                    document.getElementById('outNama').innerHTML=inputNama
+                    document.getElementById('logout').style.display='block'
+                    document.getElementById('password').value=''
+                    document.getElementById('nama').value=''
+                    printMenuAdmin()
+
+                }else{
+                    document.getElementById('outNama').innerHTML='Password Salah'
+                    
+                }
+            }
+            function printMenuUser(){
+                var output=''
+                for(var i=0; i<menu.length; i++){
+                    output+=`
+                            <tr>
+                                <td>${i+1}</td>
+                                <td id='kegiatan${i}'>${menu[i].kegiatan}</td>
+                                <td id='hari${i}'>${menu[i].hari}</td>
+                                <td id='poster${i}'><img src=${menu[i].poster} alt='Poster' width='300px;'></td>
+                                <td></td>
+                            </tr>
+                    `
+                }
+                    return document.getElementById('menu').innerHTML=output
+            }
+            function printMenuAdmin(){
+                var output=''
+                for(var i=0; i<menu.length; i++){
+                    output+=`
+                            <tr>
+                                <td>${i+1}</td>
+                                <td id='kegiatan${i}'>${menu[i].kegiatan}</td>
+                                <td id='hari${i}'>${menu[i].hari}</td>
+                                <td id='poster${i}'><img src=${menu[i].poster} alt='Poster' width='300px;'></td>
+                                <td id='action${i}'><input type='button' onclick='deleteMading(${i})' value='Delete'><input type='button' onclick='editMading(${i})' value='Edit'></td>
+                            </tr>
+                    `
+                }
+                    return document.getElementById('menu').innerHTML=output+
+                    `
+                            <tr>
+                                <td></td>
+                                <td><input type="text" id='kegiatanBaru' placeholder='Kegiatan Baru'></td>
+                                <td><input type="text" id='hariBaru' placeholder='Hari Baru'></td>
+                                <td><input type="text" id='posterBaru' placeholder='Masukan URL Poster'></td>
+                                <td><input type="button" value='Add todo' onclick='addTodo()'></td>
+                            </tr>                           
+                    `
+            }
+
+            function addTodo(){
+                var kegiatanBaru = document.getElementById('kegiatanBaru').value
+                var hariBaru = document.getElementById('hariBaru').value
+                var posterBaru = document.getElementById('posterBaru').value
+                if(kegiatanBaru === '' || hariBaru === '' || posterBaru === ''){
+                    alert('Harap Isi Semua Kolom!')
+                    printMenuAdmin()
+                }else{
+                    menu.push(new dataKegiatan(kegiatanBaru, hariBaru, posterBaru))
+                    printMenuAdmin()
+                }
+            }
+            function editMading(index){
+                document.getElementById(`kegiatan${index}`).innerHTML=`<input type='text' id='editKegiatan' placeholder='Kegiatan'>`
+                document.getElementById(`hari${index}`).innerHTML=`<select id='editHari'>
+                                                                        <option value='Senin'>Senin</option>
+                                                                        <option value='Selasa'>Selasa</option>
+                                                                        <option value='Rabu'>Rabu</option>
+                                                                        <option value='Kamis'>Kamis</option>
+                                                                        <option value='Jumat'>Jumat</option>
+                                                                        <option value='Sabtu'>Sabtu</option>
+                                                                        <option value='Minggu'>Minggu</option>
+                                                                    </select>
+                                                                    `
+                document.getElementById(`poster${index}`).innerHTML=`<input type='text' id='editPoster' placeholder='URL Poster'>`
+                document.getElementById(`action${index}`).innerHTML=`<input type='button' value='No' onclick='no()'> <input type='button' value='Yes' onclick='yes(${index})'>`
+            }
+            function yes(index){
+                var editKegiatan = document.getElementById('editKegiatan').value
+                var editHari = document.getElementById('editHari').value
+                var editPoster = document.getElementById('editPoster').value
+                if(editKegiatan === ''){
+                    editKegiatan = menu[index].kegiatan
+                }
+                if(editHari === ''){
+                    editHari = menu[index].hari
+                }
+                if(editPoster === ''){
+                    editPoster = menu[index].poster
+                }
+                
+                menu[index].kegiatan = editKegiatan
+                menu[index].hari = editHari
+                menu[index].poster= editPoster
+                printMenuAdmin()
+            }
+            function no(){
+                printMenuAdmin()
+            }
+            function deleteMading(index){
+                document.getElementById(`action${index}`).innerHTML=`<input type='button' value='No' onclick='deleteNo()'> <input type='button' value='Yes' onclick='deleteYes(${index})'>`
+            }
+            function deleteYes(index){
+                menu.splice(index, 1)
+                printMenuAdmin()
+            }
+            function deleteNo(){
+                printMenuAdmin()
+            }
+            function logout(){
+                document.getElementById('logout').style.display='none'
+                document.getElementById('menu').style.display='none'
+                document.getElementById('nama').value=''
+                document.getElementById('password').value=''
+                document.getElementById('outNama').innerHTML=''
+            }
+
+
+        </script>
+    </body>
+</html>
